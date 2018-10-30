@@ -21,19 +21,43 @@ namespace ConsoleTestingSwitches
             var p = new Program();
 
             int i = 0, tmp = 0, coordsSet = 0;
+            if (args.Length == 0)
+            {
+                var help = @"
+usage:
+  Program.exe -x val -y val -h val -w val -f procname
+
+xyhw are integers which can have negative value
+
+-x --x        x position
+-y --y        y position
+-h --height   height
+-w --width    width
+
+-f            if present doesn't require all xyhw arguments to be present,
+              uses default values instead
+                ";
+                Console.WriteLine(help);
+                return;
+            }
             while (i < args.Length)
             {
-                //Console.WriteLine("arg: " + args[i]);
                 var command = args[i];
                 switch (command)
                 {
                     case "-f":
+                    case "--force":
                         p.Forced = true;
                         break;
                     case "-x":
+                    case "--x":
                         coordsSet |= 1;
                         ++i;
-                        //Console.WriteLine(command + " " + args[i]);
+                        if (i >= args.Length)
+                        {
+                            Console.WriteLine("wrong syntax");
+                            return;
+                        }
                         if (!int.TryParse(args[i], out tmp))
                         {
                             Console.Error.WriteLine("wrong parameter, input integer");
@@ -42,9 +66,14 @@ namespace ConsoleTestingSwitches
                         p.PosX = tmp;
                         break;
                     case "-y":
+                    case "--y":
                         coordsSet |= 2;
                         ++i;
-                        //Console.WriteLine(command + " " + args[i]);
+                        if (i >= args.Length)
+                        {
+                            Console.WriteLine("wrong syntax");
+                            return;
+                        }
                         if (!int.TryParse(args[i], out tmp))
                         {
                             Console.Error.WriteLine("wrong parameter, input integer");
@@ -53,9 +82,14 @@ namespace ConsoleTestingSwitches
                         p.PosY = tmp;
                         break;
                     case "-h":
+                    case "--height":
                         coordsSet |= 4;
                         ++i;
-                        //Console.WriteLine(command + " " + args[i]);
+                        if (i >= args.Length)
+                        {
+                            Console.WriteLine("wrong syntax");
+                            return;
+                        }
                         if (!int.TryParse(args[i], out tmp))
                         {
                             Console.Error.WriteLine("wrong parameter, input integer");
@@ -64,9 +98,14 @@ namespace ConsoleTestingSwitches
                         p.Height = tmp;
                         break;
                     case "-w":
+                    case "--width":
                         coordsSet |= 8;
                         ++i;
-                        //Console.WriteLine(command + " " + args[i]);
+                        if (i >= args.Length)
+                        {
+                            Console.WriteLine("wrong syntax");
+                            return;
+                        }
                         if (!int.TryParse(args[i], out tmp))
                         {
                             Console.Error.WriteLine("wrong parameter, input integer");
@@ -84,8 +123,6 @@ namespace ConsoleTestingSwitches
                             Console.Error.WriteLine("unknown parameter: " + command);
                         break;
                 }
-
-
                 ++i;
             }
 
@@ -97,6 +134,12 @@ namespace ConsoleTestingSwitches
                 Console.Error.WriteLine("Provide all xyhw coordinates or use -f flag to force using default values");
                 return;
             }
+            //check if process name is correct
+            if (p.Procname is null)
+            {
+                Console.Error.WriteLine("Provide a correct process name");
+                return;
+            }
             WindowsResizer wr = new WindowsResizer();
             wr.resize(p.PosX, p.PosY, p.Width, p.Height, p.Procname);
 
@@ -105,7 +148,7 @@ namespace ConsoleTestingSwitches
 
         private void WriteSettings()
         {
-            Console.WriteLine("x:" + this.PosX + " y:" + this.PosY + " h:" + this.Height + " w:" + this.Width + " process name: \"" + this.Procname +"\"");
+            Console.WriteLine("x:" + this.PosX + " y:" + this.PosY + " h:" + this.Height + " w:" + this.Width + " process name: \"" + this.Procname + "\"");
         }
     }
 }
